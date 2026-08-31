@@ -14,10 +14,15 @@ if (Test-Path -LiteralPath $pendingJar) {
     $pendingFile = Get-Item -LiteralPath $pendingJar
     if (!$currentJar -or $pendingFile.LastWriteTimeUtc -gt $currentJar.LastWriteTimeUtc) {
         try {
-            if ($currentJar) { [System.IO.File]::Replace($pendingJar,$jar,$null) }
+            # Windows PowerShell converts $null to an empty path; pass a real null string.
+            if ($currentJar) { [System.IO.File]::Replace($pendingJar,$jar,[NullString]::Value) }
             else { [System.IO.File]::Move($pendingJar,$jar) }
         } catch {
-            throw 'Close all Stockroom windows, then double-click Start Stockroom again to apply the prepared update. Your saved data is unchanged.'
+            $failure = $_.Exception.GetBaseException()
+            if (($failure.HResult -band 0xFFFF) -in @(32,33)) {
+                throw 'Close all Stockroom windows, then double-click Start Stockroom again to apply the prepared update. Your saved data is unchanged.'
+            }
+            throw "Could not apply the prepared Stockroom update: $($failure.Message)"
         }
     }
 }

@@ -49,3 +49,11 @@ The small-window regression check first failed against the original layout, repr
 The Swing test now verifies three complete restock rows and scroll access to the third row at 1160 × 730. The updated test and executable build passed, and the scrolled compact preview was visually inspected. See screenshots/restock-compact.png.
 
 An optional stockroom.build.directory Maven property and BuildDirectory test-script parameter allow updates to be verified separately from a running application. The release script accepts a verified JAR path for the same reason.
+
+## Windows launcher update fix
+
+Windows PowerShell 5.1 converts a regular $null argument to an empty string when calling File.Replace. That made an update fail with "The path is not of a legal form" even after Stockroom was closed. The launcher now passes [NullString]::Value and reserves the close-window message for actual sharing or lock violations; other failures report their underlying cause.
+
+Six isolated launcher checks passed on Windows PowerShell 5.1.22621.6133: reproduction of the original command failure, replacing a closed app, installing a pending update without an existing app, starting without an update, ignoring an older pending update, and preserving both files when the active app is locked. These checks used dummy files and intercepted app launches, with no database access.
+
+The corrected launcher then installed the verified dashboard JAR, consumed the pending update, and opened the real Stockroom sign-in window. The installed executable's SHA-256 matched the previously tested pending update. Saved business records were not modified by this fix.
