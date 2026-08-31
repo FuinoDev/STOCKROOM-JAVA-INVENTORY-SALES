@@ -1,0 +1,36 @@
+name: Verify Java application
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: inventory_sales_test
+          POSTGRES_USER: inventory_test
+          POSTGRES_PASSWORD: ci-only-local-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DB_URL: jdbc:postgresql://127.0.0.1:5432/inventory_sales_test
+      TEST_DB_USERNAME: inventory_test
+      TEST_DB_PASSWORD: ci-only-local-password
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Build and test with PostgreSQL
+        run: mvn -B -ntp -Djava.awt.headless=true verify

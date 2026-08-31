@@ -1,0 +1,12 @@
+/target/
+/.local/
+/.m2/
+/config/local.properties
+/.idea/
+*.iml
+*.log
+hs_err_pid*
+/exports/
+/dist/
+.DS_Store
+/INVENTORY-AND-SALES-MANAGEMENT-SYSTEM/
