@@ -1,4 +1,4 @@
-param([switch]$SkipBuild)
+param([switch]$SkipBuild, [string]$JarPath)
 $ErrorActionPreference = 'Stop'
 $projectRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 Set-Location -LiteralPath $projectRoot
@@ -6,7 +6,8 @@ if (!$SkipBuild) {
     & mvn "-Dmaven.repo.local=$projectRoot\.m2" -B -ntp package
     if ($LASTEXITCODE -ne 0) { throw 'Build failed; no release was created.' }
 }
-$jarPath = Join-Path $projectRoot 'target\stockroom.jar'
+if (!$JarPath) { $JarPath = Join-Path $projectRoot 'target\stockroom.jar' }
+$jarPath = [System.IO.Path]::GetFullPath($JarPath)
 if (!(Test-Path -LiteralPath $jarPath)) { throw 'Build the application first.' }
 $stagingRoot = Join-Path $projectRoot ('.local\release-' + [Guid]::NewGuid().ToString('N') + '\Stockroom')
 $distRoot = Join-Path $projectRoot 'dist'

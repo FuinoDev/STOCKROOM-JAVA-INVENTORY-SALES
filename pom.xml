@@ -4,13 +4,14 @@
   <groupId>ph.stockroom</groupId><artifactId>inventory-sales</artifactId><version>1.0.0</version>
   <name>Stockroom — Java Inventory and Sales Management System</name>
   <description>Java Swing, OOP, JDBC and PostgreSQL project for Programming (Java) NC III.</description>
-  <properties><maven.compiler.release>17</maven.compiler.release><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>
+  <properties><stockroom.build.directory>${project.basedir}/target</stockroom.build.directory><maven.compiler.release>17</maven.compiler.release><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>
   <dependencies>
     <dependency><groupId>org.postgresql</groupId><artifactId>postgresql</artifactId><version>42.7.13</version></dependency>
     <dependency><groupId>com.formdev</groupId><artifactId>flatlaf</artifactId><version>3.7</version></dependency>
     <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter</artifactId><version>6.0.3</version><scope>test</scope></dependency>
   </dependencies>
   <build>
+    <directory>${stockroom.build.directory}</directory>
     <finalName>stockroom</finalName>
     <plugins>
       <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>3.5.0</version><configuration><forceCreation>true</forceCreation></configuration></plugin>

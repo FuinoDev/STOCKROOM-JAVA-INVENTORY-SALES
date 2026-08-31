@@ -51,6 +51,14 @@ class SwingSmokeTest {
         });
     }
     private static void layout(Container container) {container.doLayout();for(Component child:container.getComponents())if(child instanceof Container nested)layout(nested);}
+    private static JTable firstTable(Container parent) {
+        for(Component child:parent.getComponents()) {
+            if(child instanceof JTable table)return table;
+            if(child instanceof Container nested) {JTable table=firstTable(nested);if(table!=null)return table;}
+        }
+        return null;
+    }
+
     @AfterEach void cleanup() throws Exception {
         edt(() -> {
             for(Window w:Window.getWindows())w.dispose();
@@ -81,6 +89,25 @@ class SwingSmokeTest {
             if(page.equals("Products"))assertEquals(12,edt(() -> field(panels.get(page),"table",JTable.class).getRowCount()));
             if(page.equals("Transactions"))assertEquals(7,edt(() -> field(panels.get(page),"table",JTable.class).getRowCount()));
         }
+        OverviewPanel overview=(OverviewPanel)panels.get("Overview");
+        edt(() -> {frame.setSize(1160,730);frame.navigate("Overview");return null;});
+        waitReady(overview);capture(frame,"13-overview-compact");
+        edt(() -> {
+            JTable restock=firstTable(overview);
+            assertNotNull(restock,"The seeded dashboard must have a restock table.");
+            JViewport rows=(JViewport)restock.getParent();
+            assertTrue(rows.getExtentSize().height>=restock.getRowHeight()*3,
+                "A compact dashboard must show three complete restock rows, rather than only a table header. Available: "+rows.getExtentSize().height+"; required: "+restock.getRowHeight()*3);
+            JPanel content=field(overview,"content",JPanel.class);
+            Rectangle lastRow=SwingUtilities.convertRectangle(restock,restock.getCellRect(2,0,true),content);
+            content.scrollRectToVisible(lastRow);layout(frame.getContentPane());
+            JViewport page=(JViewport)content.getParent();
+            assertTrue(page.getViewRect().contains(lastRow),"The third restock row must be reachable by scrolling. Page: "+page.getViewRect()+"; row: "+lastRow);
+            return null;
+        });
+        capture(frame,"14-restock-compact-scrolled");
+        edt(() -> {frame.setSize(1380,870);return null;});
+
         AppPanel sales=panels.get("New sale");edt(() -> {frame.navigate("New sale");return null;});waitReady(sales);
         edt(() -> {
             JTextField search=field(sales,"search",JTextField.class);search.setText("Coca-Cola");

@@ -41,3 +41,11 @@ The Windows setup, start, stop, test, backup and package scripts are included. T
 Offscreen rendering checks validate Swing controls and layout but are not a substitute for every manual interaction on all operating systems and display scaling settings. Printer output needs a configured physical or PDF printer and was not physically printed. The GitHub workflow is supplied separately; its remote status should be checked on the repository.
 
 The application is an educational small-business desktop system, not an audited accounting package or accredited tax-invoicing system.
+
+## Dashboard restock clipping fix
+
+The small-window regression check first failed against the original layout, reproducing the reported header-only table. The corrected dashboard keeps each card at its natural height and scrolls vertically instead of compressing the restock list. Table header height is included when reserving space for rows.
+
+The Swing test now verifies three complete restock rows and scroll access to the third row at 1160 × 730. The updated test and executable build passed, and the scrolled compact preview was visually inspected. See screenshots/restock-compact.png.
+
+An optional stockroom.build.directory Maven property and BuildDirectory test-script parameter allow updates to be verified separately from a running application. The release script accepts a verified JAR path for the same reason.
